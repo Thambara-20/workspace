@@ -27,3 +27,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = "Button";
+
+export const buttonVariants = {
+  default: "bg-primary text-primary-foreground hover:bg-primary/90",
+  ghost: "bg-transparent hover:bg-muted",
+  link: "underline text-primary",
+};

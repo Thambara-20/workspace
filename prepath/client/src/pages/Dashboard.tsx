@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { getPdfs, deletePdf } from "@/api/pdfs";
+import { getStudyPlan, generateStudyPlan } from "@/api/studyPlan";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { Trash, RefreshCw } from "lucide-react";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 
 export function Dashboard() {
   const [pdfs, setPdfs] = useState<any[]>([]);
+  const [studyPlan, setStudyPlan] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -16,6 +19,7 @@ export function Dashboard() {
 
   useEffect(() => {
     fetchPdfs();
+    fetchStudyPlan();
   }, []);
 
   const fetchPdfs = async () => {
@@ -28,6 +32,19 @@ export function Dashboard() {
       setError(error?.message || "Failed to fetch PDFs");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStudyPlan = async () => {
+    try {
+      const data = await getStudyPlan();
+      setStudyPlan(data.studyPlan);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error?.message,
+      });
     }
   };
 
@@ -52,9 +69,32 @@ export function Dashboard() {
     // Logic to open file picker and handle file uploads
   };
 
+  const handleGenerateStudyPlan = async () => {
+    try {
+      setLoading(true);
+      const data = await generateStudyPlan({
+        pdfs,
+        studyDetails: { examDate: "2025-03-10", subjects: ["Math", "Science"], dailyStudyTime: 2 },
+      });
+      setStudyPlan(data.studyPlan);
+      toast({
+        title: "Success",
+        description: "Study plan generated successfully",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error?.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
-      <Card className="w-full max-w-2xl">
+      <Card className="w-full max-w-2xl mb-4">
         <CardHeader className="flex justify-between items-center">
           <CardTitle>Your Uploaded PDFs</CardTitle>
           <Button variant="ghost" size="icon" onClick={fetchPdfs}>
@@ -83,16 +123,12 @@ export function Dashboard() {
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure you want to delete this file?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(pdf._id)}>Delete</AlertDialogAction>
-                      </AlertDialogFooter>
+                      <AlertDialogTitle>Are you sure you want to delete this file?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                      <AlertDialogAction onClick={() => handleDelete(pdf._id)}>Delete</AlertDialogAction>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
@@ -103,6 +139,41 @@ export function Dashboard() {
               <p>No PDFs uploaded yet.</p>
               <Button onClick={handleUploadPDFs} className="mt-4 border-dashed border-2 border-gray-300 p-4">
                 📂 Upload PDFs
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="flex justify-between items-center">
+          <CardTitle>Your Study Plan</CardTitle>
+          <Button onClick={handleGenerateStudyPlan} className="bg-blue-500 hover:bg-blue-600 text-white">
+            Regenerate Study Plan
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {studyPlan.length > 0 ? (
+            <Accordion>
+              {studyPlan.map((session, index) => (
+                <AccordionItem key={index}>
+                  <div className="flex justify-between w-full">
+                    <span>{session.date}</span>
+                    <span>{session.duration}</span>
+                  </div>
+                  <ul>
+                    {session.topics.map((topic, idx) => (
+                      <li key={idx}>{topic}</li>
+                    ))}
+                  </ul>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-64 bg-gray-100 rounded-lg">
+              <p>No study plan generated yet.</p>
+              <Button onClick={handleGenerateStudyPlan} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white p-4">
+                Generate Study Plan
               </Button>
             </div>
           )}
