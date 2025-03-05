@@ -5,7 +5,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Home } from "./pages/Home";
-import { UploadMaterials } from "./pages/Upload";
 import { StudyPlan } from "./pages/StudyPlan";
 import { Flashcards } from "./pages/Flashcards";
 import { Settings } from "./pages/Settings";
@@ -26,14 +25,6 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Home />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/upload-materials"
-                element={
-                  <ProtectedRoute>
-                    <UploadMaterials />
                   </ProtectedRoute>
                 }
               />

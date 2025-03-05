@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/useToast';
-import { useDropzone } from 'react-dropzone';
 import { submitOnboardingDetails } from '@/api/onboarding';
 import { uploadPDFs } from '@/api/pdf';
 
@@ -29,15 +27,11 @@ export function Settings() {
     setSelectedSubjects(selectedSubjects.filter((s) => s !== subject));
   };
 
-  const onDrop = (acceptedFiles: File[]) => {
-    setUploadedFiles(acceptedFiles);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setUploadedFiles(Array.from(event.target.files));
+    }
   };
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { 'application/pdf': [] },
-    multiple: true,
-  });
 
   const handleSubmit = async () => {
     try {
@@ -117,17 +111,13 @@ export function Settings() {
         </div>
         <div className="space-y-4 mt-4">
           <Label>Upload Study Materials</Label>
-          <div
-            {...getRootProps()}
-            className={`py-8 border-dashed border-2 border-gray-300 p-6 ${
-              isDragActive ? 'bg-gray-100' : ''
-            }`}
-          >
-            <input {...getInputProps()} />
-            <p className="text-center text-gray-600">
-              Drag 'n' drop some files here, or click to select files
-            </p>
-          </div>
+          <input
+            type="file"
+            accept="application/pdf"
+            multiple
+            onChange={handleFileChange}
+            className="w-full"
+          />
           <ul className="mt-2">
             {uploadedFiles.map((file, index) => (
               <li key={index} className="text-gray-700">

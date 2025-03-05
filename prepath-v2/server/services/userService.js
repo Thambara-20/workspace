@@ -8,6 +8,7 @@ class UserService {
     try {
       return User.find();
     } catch (err) {
+      console.error('Error listing users:', err);
       throw new Error(`Database error while listing users: ${err}`);
     }
   }
@@ -16,6 +17,7 @@ class UserService {
     try {
       return User.findOne({ _id: id }).exec();
     } catch (err) {
+      console.error(`Error getting user by ID ${id}:`, err);
       throw new Error(`Database error while getting the user by their ID: ${err}`);
     }
   }
@@ -24,6 +26,7 @@ class UserService {
     try {
       return User.findOne({ email }).exec();
     } catch (err) {
+      console.error(`Error getting user by email ${email}:`, err);
       throw new Error(`Database error while getting the user by their email: ${err}`);
     }
   }
@@ -32,6 +35,7 @@ class UserService {
     try {
       return User.findOneAndUpdate({ _id: id }, data, { new: true, upsert: false });
     } catch (err) {
+      console.error(`Error updating user ${id}:`, err);
       throw new Error(`Database error while updating user ${id}: ${err}`);
     }
   }
@@ -41,6 +45,7 @@ class UserService {
       const result = await User.deleteOne({ _id: id }).exec();
       return (result.deletedCount === 1);
     } catch (err) {
+      console.error(`Error deleting user ${id}:`, err);
       throw new Error(`Database error while deleting user ${id}: ${err}`);
     }
   }
@@ -50,7 +55,7 @@ class UserService {
     if (!password) throw new Error('Password is required');
 
     try {
-      const user = await User.findOne({email}).exec();
+      const user = await User.findOne({ email }).exec();
       if (!user) return null;
 
       const passwordValid = await validatePassword(password, user.password);
@@ -60,6 +65,7 @@ class UserService {
       const updatedUser = await user.save();
       return updatedUser;
     } catch (err) {
+      console.error(`Error authenticating user ${email} with password:`, err);
       throw new Error(`Database error while authenticating user ${email} with password: ${err}`);
     }
   }
@@ -83,6 +89,7 @@ class UserService {
       await user.save();
       return user;
     } catch (err) {
+      console.error('Error creating new user:', err);
       throw new Error(`Database error while creating new user: ${err}`);
     }
   }
@@ -98,6 +105,7 @@ class UserService {
 
       return user;
     } catch (err) {
+      console.error('Error setting user password:', err);
       throw new Error(`Database error while setting user password: ${err}`);
     }
   }

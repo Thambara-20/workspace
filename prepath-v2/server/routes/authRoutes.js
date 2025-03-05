@@ -14,18 +14,22 @@ router.post('/login', async (req, res) => {
     return sendError('Email and password are required');
   }
 
-  const user = await UserService.authenticateWithPassword(email, password);
+  try {
+    const user = await UserService.authenticateWithPassword(email, password);
 
-  if (user) {
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    if (user) {
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
 
-    user.refreshToken = refreshToken;
-    await user.save();
-    return res.json({...user.toObject(), accessToken});
-  } else {
-    return sendError('Email or password is incorrect');
-
+      user.refreshToken = refreshToken;
+      await user.save();
+      return res.json({ ...user.toObject(), accessToken });
+    } else {
+      return sendError('Email or password is incorrect');
+    }
+  } catch (error) {
+    console.error(`Error during login: ${error.message}`);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 });
 
@@ -37,21 +41,26 @@ router.post('/register', async (req, res, next) => {
     const user = await UserService.create(req.body);
     return res.status(200).json(user);
   } catch (error) {
-    console.error(`Error while registering user: ${error}`);
-    return res.status(400).json({ error });
+    console.error(`Error while registering user: ${error.message}`);
+    return res.status(400).json({ message: error.message });
   }
 });
 
 router.post('/logout', async (req, res) => {
   const { email } = req.body;
 
-  const user = await User.findOne({ email });
-  if (user) {
-    user.refreshToken = null;
-    await user.save();
-  }
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      user.refreshToken = null;
+      await user.save();
+    }
 
-  res.status(200).json({ message: 'User logged out successfully.' });
+    res.status(200).json({ message: 'User logged out successfully.' });
+  } catch (error) {
+    console.error(`Error during logout: ${error.message}`);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 router.post('/refresh', async (req, res) => {
