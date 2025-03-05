@@ -17,6 +17,7 @@ import { UserPlus } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 
 type RegisterForm = {
+  username: string
   email: string
   password: string
 }
@@ -31,18 +32,18 @@ export function Register() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       setLoading(true)
-      await registerUser(data.email, data.password);
+      await registerUser(data.username, data.email, data.password);
       toast({
         title: "Success",
         description: "Account created successfully",
       })
       navigate("/login")
     } catch (error) {
-      console.log("Register error:", error)
+      console.error("Register error:", error)
       toast({
         variant: "destructive",
         title: "Error",
-        description: error?.message,
+        description: error?.message || "Failed to register",
       })
     } finally {
       setLoading(false)
@@ -58,6 +59,15 @@ export function Register() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                {...register("username", { required: true })}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

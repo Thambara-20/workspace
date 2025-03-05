@@ -33,16 +33,18 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/register', async (req, res, next) => {
-  if (req.user) {
-    return res.json({ user: req.user });
-  }
+router.post('/register', async (req, res) => {
+  console.log('Request Body:', req.body); // Add this line
   try {
-    const user = await UserService.create(req.body);
-    return res.status(200).json(user);
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+    const user = await UserService.create({ username, email, password });
+    res.status(201).json(user);
   } catch (error) {
-    console.error(`Error while registering user: ${error.message}`);
-    return res.status(400).json({ message: error.message });
+    console.error('Error while registering user:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 

@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { login as apiLogin, register as apiRegister } from "@/api/auth";
 import { useNavigate } from "react-router-dom";
+import { useToast } from '../hooks/useToast';
 
 type AuthContextType = {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -16,6 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return !!localStorage.getItem("accessToken");
   });
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (isAuthenticated && !localStorage.getItem("onboardingCompleted")) {
@@ -34,6 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Login failed');
       }
     } catch (error) {
+      console.error(error);
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("accessToken");
       setIsAuthenticated(false);
@@ -41,9 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (username: string, email: string, password: string) => {
     try {
-      const response = await apiRegister(email, password);
+      const response = await apiRegister(username, email, password);
       if (response?.accessToken) {
         localStorage.setItem("accessToken", response.accessToken);
         setIsAuthenticated(true);
@@ -52,9 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Registration failed');
       }
     } catch (error) {
+      console.error(error);
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("accessToken");
       setIsAuthenticated(false);
+      showToast(`Register error: ${error.message}`, 'error');
       throw new Error(error?.message || 'Registration failed');
     }
   };
