@@ -16,46 +16,44 @@ function App() {
     <AuthProvider>
       <ThemeProvider defaultTheme="light" storageKey="ui-theme">
         <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  {" "}
-                  <Layout />{" "}
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/upload"
-              element={
-                <ProtectedRoute>
-                  {" "}
-                  <Upload />{" "}
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/study-plan"
-              element={
-                <ProtectedRoute>
-                  {" "}
-                  <StudyPlan />{" "}
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/flashcards"
-              element={
-                <ProtectedRoute>
-                  {" "}
-                  <Flashcards />{" "}
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
+          <Layout>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/upload"
+                element={
+                  <ProtectedRoute>
+                    <Upload />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/study-plan"
+                element={
+                  <ProtectedRoute>
+                    <StudyPlan />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/flashcards"
+                element={
+                  <ProtectedRoute>
+                    <Flashcards />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Layout>
         </Router>
         <Toaster />
       </ThemeProvider>
