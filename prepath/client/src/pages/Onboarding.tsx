@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/useToast";
 import { submitOnboarding } from "@/api/onboarding";
+import { Select } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
 
 type OnboardingForm = {
   examDate: string;
-  subjects: string;
+  subjects: string[];
   dailyStudyTime: number;
   pdfs: FileList;
 };
@@ -19,14 +21,14 @@ export function Onboarding() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm<OnboardingForm>();
+  const { register, handleSubmit, setValue } = useForm<OnboardingForm>();
 
   const onSubmit = async (data: OnboardingForm) => {
     try {
       setLoading(true);
       const formData = {
         examDate: data.examDate,
-        subjects: data.subjects.split(","),
+        subjects: data.subjects,
         dailyStudyTime: data.dailyStudyTime,
         pdfs: Array.from(data.pdfs),
       };
@@ -57,19 +59,20 @@ export function Onboarding() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="examDate">Exam Date</Label>
-              <Input
-                id="examDate"
-                type="date"
-                {...register("examDate", { required: true })}
+              <Calendar
+                onChange={(date) => setValue("examDate", date.toISOString().split("T")[0])}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="subjects">Subjects</Label>
-              <Input
-                id="subjects"
-                type="text"
-                placeholder="Enter subjects separated by commas"
-                {...register("subjects", { required: true })}
+              <Select
+                multiple
+                onChange={(selected) => setValue("subjects", selected)}
+                options={[
+                  { value: "Math", label: "Math" },
+                  { value: "Science", label: "Science" },
+                  { value: "History", label: "History" },
+                ]}
               />
             </div>
             <div className="space-y-2">
