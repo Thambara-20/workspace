@@ -18,8 +18,16 @@ const generatePasswordHash = async (password) => {
  * @return {boolean} True if the password matches the hash, false otherwise
  */
 const validatePassword = async (password, hash) => {
-  const result = await bcrypt.compare(password, hash);
-  return result;
+  try {
+    const isValid = await bcrypt.compare(password, hash);
+    if (!isValid) {
+      console.error(`Password validation failed: plainPassword=${password}, hashedPassword=${hash}`);
+    }
+    return isValid;
+  } catch (error) {
+    console.error('Error during password validation:', error);
+    throw error;
+  }
 };
 
 /**
