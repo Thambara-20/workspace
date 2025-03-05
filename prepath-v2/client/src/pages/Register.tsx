@@ -38,7 +38,7 @@ export function Register() {
         description: "Account created successfully",
       })
       navigate("/login")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Register error:", error)
       toast({
         variant: "destructive",

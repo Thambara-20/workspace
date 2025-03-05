@@ -17,7 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return !!localStorage.getItem("accessToken");
   });
   const navigate = useNavigate();
-  const { showToast } = useToast();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isAuthenticated && !localStorage.getItem("onboardingCompleted")) {
@@ -54,12 +54,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         throw new Error('Registration failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("accessToken");
       setIsAuthenticated(false);
-      showToast(`Register error: ${error.message}`, 'error');
+      toast({
+        variant: "destructive",
+        title: "Register error",
+        description: error.message || 'Registration failed',
+      });
       throw new Error(error?.message || 'Registration failed');
     }
   };
