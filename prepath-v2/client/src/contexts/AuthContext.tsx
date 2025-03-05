@@ -1,6 +1,6 @@
-
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { login as apiLogin, register as apiRegister } from "@/api/auth";
+import { useNavigate } from "react-router-dom";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -15,6 +15,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return !!localStorage.getItem("accessToken");
   });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && !localStorage.getItem("onboardingCompleted")) {
+      navigate("/onboarding");
+    }
+  }, [isAuthenticated, navigate]);
 
   const login = async (email: string, password: string) => {
     try {
@@ -24,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("accessToken", response.accessToken);
         setIsAuthenticated(true);
       } else {
-        throw new Error(error?.response?.data?.message || 'Login failed');
+        throw new Error('Login failed');
       }
     } catch (error) {
       localStorage.removeItem("refreshToken");
@@ -37,6 +44,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (email: string, password: string) => {
     try {
       const response = await apiRegister(email, password);
+      if (response?.accessToken) {
+        localStorage.setItem("accessToken", response.accessToken);
+        setIsAuthenticated(true);
+        navigate("/onboarding");
+      } else {
+        throw new Error('Registration failed');
+      }
     } catch (error) {
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("accessToken");
@@ -48,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("onboardingCompleted");
     setIsAuthenticated(false);
   };
 

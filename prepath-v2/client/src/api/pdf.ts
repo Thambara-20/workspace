@@ -1,7 +1,7 @@
 import api from './api';
 
 // Description: Upload PDFs
-// Endpoint: POST /api/pdf/upload
+// Endpoint: POST /api/upload-materials
 // Request: { files: FileList }
 // Response: { success: boolean, message: string }
 export const uploadPDFs = (files: FileList) => {
@@ -15,7 +15,7 @@ export const uploadPDFs = (files: FileList) => {
   // try {
   //   const formData = new FormData();
   //   Array.from(files).forEach((file) => formData.append('files', file));
-  //   return await api.post('/api/pdf/upload', formData);
+  //   return await api.post('/api/upload-materials', formData);
   // } catch (error) {
   //   throw new Error(error?.response?.data?.error || error.message);
   // }

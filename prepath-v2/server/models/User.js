@@ -1,53 +1,25 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
-const { validatePassword, isPasswordHash } = require('../utils/password.js');
-const {randomUUID} = require("crypto");
-
-const schema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    index: true,
-    unique: true,
-    lowercase: true,
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  onboardingDetails: {
+    examDate: String,
+    selectedSubjects: [String],
+    studyHours: String,
   },
-  password: {
-    type: String,
-    required: true,
-    validate: { validator: isPasswordHash, message: 'Invalid password hash' },
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    immutable: true,
-  },
-  lastLoginAt: {
-    type: Date,
-    default: Date.now,
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
-  refreshToken: {
-    type: String,
-    unique: true,
-    index: true,
-    default: () => randomUUID(),
-  },
-}, {
-  versionKey: false,
 });
 
-schema.set('toJSON', {
-  /* eslint-disable */
-  transform: (doc, ret, options) => {
-    delete ret.password;
-    return ret;
-  },
-  /* eslint-enable */
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-const User = mongoose.model('User', schema);
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

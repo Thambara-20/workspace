@@ -24,14 +24,11 @@ export function Navbar() {
               <Link to="/" className="hover:underline">
                 Home
               </Link>
-              <Link to="/upload" className="hover:underline">
-                Upload
-              </Link>
               <Link to="/study-plan" className="hover:underline">
                 Study Plan
               </Link>
-              <Link to="/flashcards" className="hover:underline">
-                Flashcards
+              <Link to="/settings" className="hover:underline">
+                Settings
               </Link>
             </div>
           )}
@@ -67,22 +64,16 @@ export function Navbar() {
             Home
           </Link>
           <Link
-            to="/upload"
-            className="block px-4 py-2 hover:bg-gray-600 w-full"
-          >
-            Upload
-          </Link>
-          <Link
             to="/study-plan"
             className="block px-4 py-2 hover:bg-gray-600 w-full"
           >
             Study Plan
           </Link>
           <Link
-            to="/flashcards"
+            to="/settings"
             className="block px-4 py-2 hover:bg-gray-600 w-full"
           >
-            Flashcards
+            Settings
           </Link>
           <Button
             variant="solid"

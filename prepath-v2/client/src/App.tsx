@@ -5,17 +5,18 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Home } from "./pages/Home";
-import { Upload } from "./pages/Upload";
+import { UploadMaterials } from "./pages/Upload";
 import { StudyPlan } from "./pages/StudyPlan";
 import { Flashcards } from "./pages/Flashcards";
+import { Settings } from "./pages/Settings";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <AuthProvider>
-      <ThemeProvider defaultTheme="light" storageKey="ui-theme">
-        <Router>
+    <Router>
+      <AuthProvider>
+        <ThemeProvider defaultTheme="light" storageKey="ui-theme">
           <Layout>
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -29,10 +30,10 @@ function App() {
                 }
               />
               <Route
-                path="/upload"
+                path="/upload-materials"
                 element={
                   <ProtectedRoute>
-                    <Upload />
+                    <UploadMaterials />
                   </ProtectedRoute>
                 }
               />
@@ -52,12 +53,20 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </Layout>
-        </Router>
-        <Toaster />
-      </ThemeProvider>
-    </AuthProvider>
+          <Toaster />
+        </ThemeProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
